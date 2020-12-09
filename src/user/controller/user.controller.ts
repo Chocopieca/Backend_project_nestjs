@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { CreateUserDto } from '../modules/dto/createUser.dto';
-import { RoleEnum } from '../modules/user.enum';
+import { RoleEnum } from '../modules/enum/user.enum';
 import { UserI } from '../modules/user.interface';
 import { UserService } from '../service/user.service';
 

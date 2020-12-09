@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt} from 'passport-jwt';
+import { Request } from 'express'
 
 import { TokenService } from "src/token/token.service";
 import { UserI } from "src/user/modules/user.interface";
@@ -16,20 +17,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get<string>('JWT_SECRET'),
-      PassReqToCallback: true,
+      passReqToCallback: true,
     });
   }
 
-  async validate( req, user: Partial<UserI> ) {
-    console.log("user.id: ===>",user.id);
-    console.log("req: ===>",req);
-    
-    const token = req.headers.authorization.slice(7);
+  async validate( req: Request, user: Partial<UserI> ) {
+    const token = req.headers.authorization.slice(7)
     const tokenExists = await this.tokenService.exists(user.id, token);
     if(tokenExists) {
       return user;
     } else {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("User not sign in");
     }
   }
 }

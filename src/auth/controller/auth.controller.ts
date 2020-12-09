@@ -1,8 +1,11 @@
-import { Controller, Post, Get, Body, ValidationPipe, Query, Patch, UseGuards, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Body, Headers, ValidationPipe, Query, Patch, UseGuards, Delete, Header } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
-import { GetUser } from 'src/components/decorators/get-user.decorator';
 
+
+import { GetUser } from 'src/components/decorators/get-user.decorator';
+import { UserTokenI } from 'src/token/modules/user_token.inteface';
+import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from 'src/user/modules/dto/createUser.dto';
 import { ReadableUserI } from 'src/user/modules/readable-user.interface';
 import { UserI } from 'src/user/modules/user.interface';
@@ -16,7 +19,10 @@ import { AuthService } from '../service/auth.service';
 @Controller('auth')
 export class AuthController {
   
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService,
+    ) {}
 
   @Post('/signUp')
   async signUp(@Body(new ValidationPipe()) createUserDto: CreateUserDto): Promise<boolean> {
@@ -40,21 +46,21 @@ export class AuthController {
   }
 
   @Patch('/changePassword')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard())
   async changePassword(
-    @GetUser() user: UserI,
+    @GetUser() user: UserTokenI,
     @Body(new ValidationPipe()) changePasswordDto: ChangePasswordDto
   ): Promise<boolean> {
-    console.log('Getusers user: ===>',user);
-    return await this.authService.changePassword(user.id, changePasswordDto)
+    return await this.authService.changePassword(user.userid, changePasswordDto)
   }
 
   @Delete('/logout')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard())
   async logout(
-    @GetUser() user: UserI,
+    @GetUser() user: UserTokenI,
+    @Headers("authorization") header
   ): Promise<boolean> {
-    // await this.authService.logout(user, token)
+    await this.authService.logout(user, header.slice(7))
     return true
   }
 }

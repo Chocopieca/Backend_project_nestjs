@@ -5,7 +5,9 @@ export class CreateUserTokenDto {
   @IsString()
   token: string
   @IsString()
-  user: string
+  id: string
   @IsDateString()
   created: string
+  @IsString()
+  userid: string
 }

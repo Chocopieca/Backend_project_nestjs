@@ -7,7 +7,8 @@ import * as bcrypt from 'bcrypt'
 import { CreateUserDto } from '../modules/dto/createUser.dto';
 import { UserE } from '../modules/user.entity';
 import { UserI } from '../modules/user.interface';
-import { RoleEnum } from '../modules/user.enum';
+import { RoleEnum } from '../modules/enum/user.enum';
+import { UserTokenI } from 'src/token/modules/user_token.inteface';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,7 @@ export class UserService {
 
     async creatUser(createUserDto: CreateUserDto, role: RoleEnum): Promise<UserI> {
         const hash = await this.hashPassword(createUserDto.password)
+        
         const hashUser = lodash.assignIn(createUserDto, { password: hash, role });
         return this.userRepository.save(hashUser)
     }
@@ -43,7 +45,7 @@ export class UserService {
     }
 
     async update(id: string, payload: Partial<UserI>) {
-        return this.userRepository.update({id: id}, payload)
+        return await this.userRepository.update(id, {password: payload.password})
     }
 
     async save(createUserDto: CreateUserDto): Promise<UserI> {

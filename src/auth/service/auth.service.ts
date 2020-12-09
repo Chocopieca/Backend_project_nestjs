@@ -10,7 +10,7 @@ import { TokenService } from 'src/token/token.service';
 import { CreateUserDto } from 'src/user/modules/dto/createUser.dto';
 import { UserService } from 'src/user/service/user.service';
 import { UserI } from 'src/user/modules/user.interface';
-import { RoleEnum } from 'src/user/modules/user.enum';
+import { RoleEnum } from 'src/user/modules/enum/user.enum';
 import { MailService } from 'src/mail/service/mail.service';
 import { StatusEnum } from 'src/user/modules/status.enum';
 import { SignInDto } from '../modules/dto/signing.dto';
@@ -19,6 +19,7 @@ import { userSensitiveFieldsEnum } from 'src/user/modules/enum/protected-fields.
 import { tokenPayloadI } from '../modules/token-payload.interface';
 import { ForgotPassDto } from '../modules/dto/forgot-pass.dto';
 import { ChangePasswordDto } from '../modules/dto/change-password.dto';
+import { UserTokenI } from 'src/token/modules/user_token.inteface';
 
 @Injectable()
 export class AuthService {
@@ -90,7 +91,7 @@ export class AuthService {
     return true;
   }
 
-  async logout(user: UserI, token): Promise<boolean> {
+  async logout(user: UserTokenI, token): Promise<boolean> {
     await this.tokenService.delete(user.id, token)
     return true
   }
@@ -105,15 +106,18 @@ export class AuthService {
       id: user.id,
       status: user.status,
       role: user.role,
+      userid: user.id
     };
     const token = await this.generateToken(tokenPayload, { expiresIn });
     const expireAt = moment()
     .add(2, 'h')
     .toISOString()
+    
     await this.tokenService.create({
       token, 
-      user: user.id, 
-      created: expireAt
+      id: user.id, 
+      created: expireAt,
+      userid: user.id
     })
     return token 
   }
@@ -123,16 +127,16 @@ export class AuthService {
   }
 
   private async verifyToken(token: string): Promise<any> {
-    try {
-      const data = this.jwtService.verify(token) as tokenPayloadI
+    try {      
+      const data = await this.jwtService.verify(token) as tokenPayloadI
       const tokenExist = await this.tokenService.exists(data.id, token);
-
+      
       if(tokenExist) {
         return data;
       }
       throw new UnauthorizedException();
     } catch(err) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(err);
     }
   }
 

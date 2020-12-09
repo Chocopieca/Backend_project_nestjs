@@ -1,7 +1,8 @@
+import { update } from "lodash";
 import { UserTokenE } from "src/token/modules/user_token.entity";
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { StatusEnum } from "./status.enum";
-import { PositionEnum, RoleEnum } from "./user.enum";
+import { PositionEnum, RoleEnum } from "./enum/user.enum";
 
 @Entity()
 export class UserE {
@@ -9,19 +10,19 @@ export class UserE {
     id: string;
 
     // unique????
-    @Column({readonly: false})
+    @Column({readonly: false, unique: true})
     email: string;
     
-    @Column({readonly: true})
+    @Column({readonly: false})
     password: string;
     
     @Column({readonly: false})
     phoneNumber: string;
     
-    @Column({readonly: true})
+    @Column({readonly: false})
     firstName: string;
     
-    @Column({readonly: true})
+    @Column({readonly: false})
     lastName: string;
     
     @Column({readonly: false})
@@ -44,7 +45,7 @@ export class UserE {
     })
     role: string;
 
-    @OneToMany(() => UserTokenE, token => token.user)
+    @OneToMany(() => UserTokenE, token => token.id)
     token: UserTokenE[]
 
     @Column({

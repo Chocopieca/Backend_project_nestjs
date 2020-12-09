@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 
 import { UserTokenE } from './modules/user_token.entity';
 import { CreateUserTokenDto } from './modules/user_token.dto'
 import { UserTokenI } from './modules/user_token.inteface';
+import { TokenDto } from 'src/auth/modules/dto/logout.dto';
 
 @Injectable()
 export class TokenService {
@@ -21,7 +22,7 @@ export class TokenService {
     return await this.userTokenRepository.createQueryBuilder()
       .delete()  
       .from(UserTokenE)
-      .where({user: userid})
+      .where({id: userid})
       .andWhere('token = :token', {token})
       .execute()
   }
@@ -30,15 +31,19 @@ export class TokenService {
     return await this.userTokenRepository.createQueryBuilder()
       .delete()  
       .from(UserTokenE)
-      .where({user: userid})
+      .where({id: userid})
       .execute()
   }
 
-  async exists(userid: string, token: string): Promise<UserTokenI> {
-    const exists = await this.userTokenRepository.createQueryBuilder()
-      .where({user: userid})
+  async exists(userid: string, token: string): Promise<any> {
+    const exists: UserTokenI = await this.userTokenRepository.createQueryBuilder()
+      .where({id: userid})
       .andWhere('token = :token', {token})
       .getOne()
-    return exists
+    if(exists) {
+      return exists
+    } else {
+      throw new NotFoundException('Token not fined')
+    }
   }
 }

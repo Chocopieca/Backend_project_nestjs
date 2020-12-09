@@ -1,5 +1,5 @@
 export enum StatusEnum {
   pending = 'pending',
-  active = 'acrive',
+  active = 'active',
   blocked = 'blocked',
 }
