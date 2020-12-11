@@ -1,3 +1,5 @@
+import { UserI } from "src/user/modules/user.interface";
+
 export interface CompanyI {
     id: string;
     name: string;
@@ -6,4 +8,5 @@ export interface CompanyI {
     numberOfEmployees: number;
     description: string;
     type: string;
+    user?: UserI[];
 }

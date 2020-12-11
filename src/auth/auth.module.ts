@@ -23,6 +23,7 @@ import { MailModule } from 'src/mail/mail.module';
     MailModule,
   ],
   providers: [AuthService, JwtStrategy],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService]
 })
 export class AuthModule {}

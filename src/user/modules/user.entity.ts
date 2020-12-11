@@ -1,15 +1,15 @@
 import { update } from "lodash";
 import { UserTokenE } from "src/token/modules/user_token.entity";
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany } from "typeorm";
 import { StatusEnum } from "./status.enum";
 import { PositionEnum, RoleEnum } from "./enum/user.enum";
+import { CompanyE } from "src/company/modules/company.entity";
 
 @Entity()
 export class UserE {
     @PrimaryGeneratedColumn()
     id: string;
 
-    // unique????
     @Column({readonly: false, unique: true})
     email: string;
     
@@ -45,8 +45,11 @@ export class UserE {
     })
     role: string;
 
-    @OneToMany(() => UserTokenE, token => token.id)
+    @OneToMany(() => UserTokenE, token => token.id, { cascade: true })
     token: UserTokenE[]
+
+    @ManyToMany(() => CompanyE, company => company.user)
+    company: string[]
 
     @Column({
         type: 'enum',

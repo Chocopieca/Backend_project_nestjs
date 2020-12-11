@@ -12,7 +12,6 @@ import { UserTokenI } from 'src/token/modules/user_token.inteface';
 
 @Injectable()
 export class UserService {
-
     private readonly saltRound = 10;
 
     constructor(
@@ -44,8 +43,17 @@ export class UserService {
         return this.userRepository.findOne({ email })
     }
 
-    async update(id: string, payload: Partial<UserI>) {
-        return await this.userRepository.update(id, {password: payload.password})
+    async updateUser(id?: string, payload?: Partial<UserI>, user?: UserI) {
+        if(payload) {
+            return await this.userRepository.update(id, {password: payload.password})
+        } else if(user) {
+            return await this.userRepository.update(id, user)
+        }
+    }
+
+    async delete(id: string): Promise<boolean> {
+        await this.userRepository.delete(id)
+        return true
     }
 
     async save(createUserDto: CreateUserDto): Promise<UserI> {

@@ -3,7 +3,7 @@ import { IsString, IsEmail, IsEnum, IsNotEmpty} from 'class-validator'
 import { PositionEnum, RoleEnum } from '../enum/user.enum';
 
 export class CreateUserDto {
-    id: string;
+    id?: string;
     @IsNotEmpty()
     @IsEmail()
     @ApiProperty()

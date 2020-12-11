@@ -72,21 +72,21 @@ export class AuthService {
     }
     const token = this.createToken(user);
     const forgotLink = `${this.clientAppUrl}/auth/forgotPassword?token=${token}`;
-    await this.mailService.send({
-        from: this.cofigService.get<string>('JS_CODE_MAIL'),
-        to: user.email,
-        subject: 'Verify User',
-        html: `
-        <h3>Hello ${user.firstName}!</h3>
-        <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
-        `,
-    })
+    // await this.mailService.send({
+    //     from: this.cofigService.get<string>('JS_CODE_MAIL'),
+    //     to: user.email,
+    //     subject: 'Verify User',
+    //     html: `
+    //     <h3>Hello ${user.firstName}!</h3>
+    //     <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
+    //     `,
+    // })
     return true
   }
 
   async changePassword(userid: string, changePasswordDto: ChangePasswordDto): Promise<boolean> {
     const password = await this.userService.hashPassword(changePasswordDto.password);
-    await this.userService.update(userid, {password});
+    await this.userService.updateUser(userid, {password});
     await this.tokenService.deleteall(userid);
     return true;
   }
@@ -143,15 +143,15 @@ export class AuthService {
   private async sendConfirmation(user: UserI) {
     const token = await this.createToken(user, false)
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
-    await this.mailService.send({
-      from: this.cofigService.get<string>('JS_CODE_MAIL'),
-      to: user.email,
-      subject: 'Verify User',
-      html: `
-      <h3>Hello ${user.firstName}!</h3>
-      <p>Please use this <a href="${confirmLink}">link</a> to confirm your account.</p>
-      `,
-    });
+    // await this.mailService.send({
+    //   from: this.cofigService.get<string>('JS_CODE_MAIL'),
+    //   to: user.email,
+    //   subject: 'Verify User',
+    //   html: `
+    //   <h3>Hello ${user.firstName}!</h3>
+    //   <p>Please use this <a href="${confirmLink}">link</a> to confirm your account.</p>
+    //   `,
+    // });
   }
 
 
