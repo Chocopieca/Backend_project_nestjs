@@ -18,6 +18,10 @@ export class TokenService {
     return await this.userTokenRepository.save(CreateUserTokenDto);
   }
 
+  async findAll(): Promise<any> {
+    return await this.userTokenRepository.find()
+  }
+
   async delete(userid: string, token: string): Promise<DeleteResult> {
     return await this.userTokenRepository.createQueryBuilder()
       .delete()  

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -9,6 +9,10 @@ import { AuthModule } from './auth/auth.module';
 import { configModule } from './config.root';
 import { TokenModule } from './token/token.module';
 import { MailModule } from './mail/mail.module';
+import { TokenCheck } from './components/middleware/loger.middleware';
+import { UserController } from './user/controller/user.controller';
+import { CompanyController } from './company/controller/company.controller';
+import { AuthController } from './auth/controller/auth.controller';
 
 @Module({
   imports: [
@@ -32,4 +36,8 @@ import { MailModule } from './mail/mail.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TokenCheck).forRoutes(UserController, CompanyController, AuthController)
+  }
+}

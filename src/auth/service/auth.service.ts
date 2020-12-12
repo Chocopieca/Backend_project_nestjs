@@ -95,13 +95,28 @@ export class AuthService {
     await this.tokenService.delete(user.id, token)
     return true
   }
+
+  async verifyToken(token: string): Promise<tokenPayloadI> {
+    try {       
+      const data = await this.jwtService.verify(token) as tokenPayloadI
+      const tokenExist = await this.tokenService.exists(data.id, token);
+      
+      if(tokenExist) {
+        return data;
+      }
+      throw new UnauthorizedException();
+    } catch(err) {
+      throw new UnauthorizedException(err);
+    }
+  }
   
   // ------------------------------------------
   private async createToken(user: UserI, withStatusCheck: boolean = true): Promise<string> {
     if(withStatusCheck && (user.status !== StatusEnum.active )){
       throw new MethodNotAllowedException("User is not active")
     }
-    const expiresIn = 60 * 60 * 2;
+    // const expiresIn = 60 * 60 * 2;
+    const expiresIn = 60;
     const tokenPayload: tokenPayloadI = {
       id: user.id,
       status: user.status,
@@ -124,20 +139,6 @@ export class AuthService {
 
   private async generateToken(data: tokenPayloadI, option?: SignOptions): Promise<string> {
     return this.jwtService.sign(data, option)
-  }
-
-  private async verifyToken(token: string): Promise<any> {
-    try {      
-      const data = await this.jwtService.verify(token) as tokenPayloadI
-      const tokenExist = await this.tokenService.exists(data.id, token);
-      
-      if(tokenExist) {
-        return data;
-      }
-      throw new UnauthorizedException();
-    } catch(err) {
-      throw new UnauthorizedException(err);
-    }
   }
 
   private async sendConfirmation(user: UserI) {
